@@ -257,7 +257,7 @@ public class GUISoftComp extends JFrame {
 		gbc_RankSelektionRadiobtn.gridy = 12;
 		contentPane.add(RankSelektionRadiobtn, gbc_RankSelektionRadiobtn);
 
-		JLabel Populationlbl = new JLabel("Population: "+pop);
+		JLabel Populationlbl = new JLabel("Population: " + pop);
 		GridBagConstraints gbc_Populationlbl = new GridBagConstraints();
 		gbc_Populationlbl.anchor = GridBagConstraints.WEST;
 		gbc_Populationlbl.insets = new Insets(0, 0, 5, 5);
@@ -290,7 +290,7 @@ public class GUISoftComp extends JFrame {
 		gbc_CalcBtn.gridx = 2;
 		gbc_CalcBtn.gridy = 16;
 		contentPane.add(CalcBtn, gbc_CalcBtn);
-		
+
 		slider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -303,9 +303,9 @@ public class GUISoftComp extends JFrame {
 				indiv = pop * gen;
 				System.out.println(pop);
 				System.out.println(gen);
-				Populationlbl.setText("Pupulation: "+ pop);
-				Generationlbl.setText("Gerationen: "+ gen);
-				lblIndividuen.setText("Individuen: "+indiv);
+				Populationlbl.setText("Pupulation: " + pop);
+				Generationlbl.setText("Gerationen: " + gen);
+				lblIndividuen.setText("Individuen: " + indiv);
 			}
 		});
 
@@ -350,7 +350,7 @@ public class GUISoftComp extends JFrame {
 		gbc_lblallesgenial.gridx = 1;
 		gbc_lblallesgenial.gridy = 20;
 		contentPane.add(lblallesgenial, gbc_lblallesgenial);
-		
+
 		CalcBtn.addActionListener(new ActionListener() {
 
 			@Override
@@ -360,27 +360,29 @@ public class GUISoftComp extends JFrame {
 					if (g == gen && (100000 - (pop * gen)) != 0) {
 						einGA.setPopulation(100000 - (pop * gen));
 					}
-					if (EinPunktRadiobtn.getModel().isSelected()) {
-						einGA.onePointCrossover();
+					if (g == gen && (100000 - (pop * gen)) == 0) {
 					} else {
-						einGA.uniformCrossover();
-					}
-					if (FlipMutaRadioButton.getModel().isSelected()) {
-						einGA.flipMutation();
-					} else {
-						einGA.swapMutation();
-					}
+						if (EinPunktRadiobtn.getModel().isSelected()) {
+							einGA.onePointCrossover();
+						} else {
+							einGA.uniformCrossover();
+						}
+						if (FlipMutaRadioButton.getModel().isSelected()) {
+							einGA.flipMutation();
+						} else {
+							einGA.swapMutation();
+						}
 
-					if (RankSelektionRadiobtn.getModel().isSelected()) {
-						einGA.selectionRankReplacement(2);// Dekodieren
-					} else if (SteadystateRadioBtn.getModel().isSelected()) {
-						// nomethod?
-					} else {
-						einGA.selectionGenReplacement();
+						if (RankSelektionRadiobtn.getModel().isSelected()) {
+							einGA.selectionRankReplacement(2);// Dekodieren
+						} else if (SteadystateRadioBtn.getModel().isSelected()) {
+							// nomethod?
+						} else {
+							einGA.selectionGenReplacement();
+						}
+						lblBesteLoesung.setText("Beste L\u00F6sung: " + einGA.besteFitness);
+						lblFitness.setText("Fitness: " + einGA.aktLoesung);
 					}
-					lblBesteLoesung.setText("Beste L\u00F6sung: "+einGA.besteFitness);
-					lblFitness.setText("Fitness: "+einGA.aktLoesung);
-					
 				}
 
 			}

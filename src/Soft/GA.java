@@ -424,16 +424,14 @@ class GA {
 			case 2:
 				for (int i = 0; i < anz; i++) {
 					for (Map.Entry<int[], Float> entry : sortedProbabilityMapA.entrySet()) {
-						float randomValue = r.nextFloat();
-						if (randomValue <= entry.getValue()) {
+						if (r.nextFloat() <= entry.getValue()) {
 							entry.setValue(0f);
 							save[i] = entry.getKey();
 							successAmount++;
 						}
 					}
 					for (Map.Entry<int[], Float> entry : sortedProbabilityMapB.entrySet()) {
-						float randomValue = r.nextFloat();
-						if (randomValue <= entry.getValue()) {
+						if (r.nextFloat() <= entry.getValue()) {
 							entry.setValue(0f);
 							save[i] = entry.getKey();
 							successAmount++;
@@ -461,21 +459,19 @@ class GA {
 					}
 				}
 				break;
-		// Würfel einmal und überprüfe jedes Individuum (findet zu selten statt).
+		// Würfel einmal für jedes Individuum (findet zu selten statt).
 			case 4:
 				int iterator3 = 0;
-				float randomValue = r.nextFloat();
 				for (Map.Entry<int[], Float> entry : sortedProbabilityMapA.entrySet()) {
-					if (randomValue <= entry.getValue()) {
+					if (r.nextFloat() <= entry.getValue()) {
 						save[iterator3] = entry.getKey();
 						successAmount++;
 						iterator3++;
 					}
 				}
 				iterator3 = 0;
-				randomValue = r.nextFloat();
 				for (Map.Entry<int[], Float> entry : sortedProbabilityMapB.entrySet()) {
-					if (randomValue <= entry.getValue()) {
+					if (r.nextFloat() <= entry.getValue()) {
 						save[iterator3] = entry.getKey();
 						successAmount++;
 						iterator3++;
