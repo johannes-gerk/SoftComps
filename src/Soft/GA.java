@@ -15,26 +15,33 @@ import java.sql.Time;
 
 class GA {
 
-	static int anz = 10; // Anzahl Individuen
-	static int gene = 100; // Anzahl Gene
-	static int pm = 2; // Wahrscheinlichkeit fuer Mutation
+	int anz; // Anzahl Individuen
+	static int gene; // Anzahl Gene
+	static int pm; // Wahrscheinlichkeit fuer Mutation
 
-	int[][] eltern = new int[anz][gene];
-	int[][] nachkommen = new int[anz][gene];
-	float besteFitness = -9999999.9f;
-	int[] besteLsg = new int[gene];
+	int[][] eltern;
+	int[][] nachkommen;
+	
+	float besteFitness;
+	float aktLoesung;
+	
+	int[] besteLsg;
+	float[] fitnessA;
 
-	float[] fitnessA = new float[anz];
+	float[] fitnessB;
 
-	float[] fitnessB = new float[anz];
-
-	float[][] nutzwerteA = null;
-	float[][] nutzwerteB = null;
+	float[][] nutzwerteA;
+	float[][] nutzwerteB;
 
 	// "Zufallsgenerator"
 	java.sql.Timestamp time = new java.sql.Timestamp(System.currentTimeMillis());
 	Random r = new Random(time.getTime());
 
+	void setPopulation(int pop){
+		this.anz = pop;
+		System.out.println("overwritten pop: " + anz);
+	}
+	
 	float berechneFitness(int indiv, float[][] nutzwerte) {
 		/*
 		 * float deciwert=-1.0f; float dualwert= 0.0f; float fitness;
@@ -84,7 +91,20 @@ class GA {
 		return result;
 	}
 
-	GA() {
+	public GA(int anz, int pm) {
+			
+		this.anz = anz; // Anzahl Individuen
+		gene = 100; // Anzahl Gene
+		this.pm = pm; // Wahrscheinlichkeit fuer Mutation
+
+		eltern = new int[anz][gene];
+		nachkommen = new int[anz][gene];
+		besteFitness = -9999999.9f;
+		besteLsg = new int[gene];
+
+		fitnessA = new float[anz];
+		fitnessB = new float[anz];
+		
 		/* Daten einlesen. */
 		 nutzwerteA = deserializeArr("src\\Soft\\AgentA_Arr.ser");
 		 nutzwerteB = deserializeArr("src\\Soft\\AgentB_Arr.ser");
@@ -120,7 +140,7 @@ class GA {
 			}
 			System.out.println();
 
-			// Soziale Wohlfahrt = gr��te Summer beider Agenten.
+			// Soziale Wohlfahrt = groesste Summe beider Agenten.
 			// Berechne Fitness aller Eltern.
 			fitnessA[i] = berechneFitness(i, nutzwerteA);
 			fitnessB[i] = berechneFitness(i, nutzwerteB);
@@ -199,7 +219,7 @@ class GA {
 		for (int i = 0; i < anz-1; i++) {
 			indi1 = Math.abs(r.nextInt()) % anz;
 			indi2 = Math.abs(r.nextInt()) % anz;
-			if (fitnessA[indi1]+fitnessB[indi1] > fitnessA[indi2]+fitnessB[indi2]) {
+		if (fitnessA[indi1]+fitnessB[indi1] > fitnessA[indi2]+fitnessB[indi2]) {
 				elter1 = indi1;
 			} else {
 				elter1 = indi2;
@@ -257,15 +277,15 @@ class GA {
 			for (int j = 0; j < gene; j++) {
 
 				// Auswahl ZWEIER random Stellen
-				zz1 = Math.abs(r.nextInt()) % 1000;
-				System.out.println("erster Wert: " + zz1);
-				zz2 = Math.abs(r.nextInt()) % 1000;
-				System.out.println("zweiter Wert: " + zz2);
+				zz1 = Math.abs(r.nextInt()) % anz;
+				//System.out.println("erster Wert: " + zz1);
+				zz2 = Math.abs(r.nextInt()) % anz;
+				//System.out.println("zweiter Wert: " + zz2);
 				// Tauschen der Bits
 				nachkommen[i][j] = eltern[zz1][j];
-				System.out.println("erste Ersetzung: " + nachkommen[zz2][j] + " wird zu " + eltern[zz1][j]);
+				//System.out.println("erste Ersetzung: " + nachkommen[zz2][j] + " wird zu " + eltern[zz1][j]);
 				nachkommen[i][j] = eltern[zz2][j];
-				System.out.println("zweite Ersetzung: " + nachkommen[zz1][j] + " wird zu " + eltern[zz2][j]);
+				//System.out.println("zweite Ersetzung: " + nachkommen[zz1][j] + " wird zu " + eltern[zz2][j]);
 			}
 		}
 	}
@@ -308,7 +328,7 @@ class GA {
 			result +="["+k+"]";
 		}
 		
-		float aktLoesung = fitnessA[0]+fitnessB[0];
+		aktLoesung = fitnessA[0]+fitnessB[0];
 		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + aktLoesung);
 		//print result
 		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + fitnessA[0]+fitnessB[0] + " Bestes Individuum: "+result);
@@ -482,7 +502,7 @@ class GA {
 		for (int k: besteLsg) {
 			result +="["+k+"]";
 		}
-		float aktLoesung = fitnessA[0]+fitnessB[0];
+		aktLoesung = fitnessA[0]+fitnessB[0];
 		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + aktLoesung + " Success-Gen-Rep: "+successAmount);
 		/*
 		 * for(int j=0;j<gene;j++) { System.out.print(" "+eltern[0][j]); }
@@ -498,7 +518,6 @@ class GA {
         try {
             FileInputStream fileStr = new FileInputStream(filename);
             ObjectInputStream in = new ObjectInputStream(fileStr);
-            System.out.println(in);
 
             // Reading the object => deserialization of object
             //#####Arr -> your generated Mat

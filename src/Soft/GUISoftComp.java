@@ -19,8 +19,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-
-import servlet.GA;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class GUISoftComp extends JFrame {
 
@@ -29,6 +29,10 @@ public class GUISoftComp extends JFrame {
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
 	private final ButtonGroup buttonGroup_2 = new ButtonGroup();
 	private JTextField WahrscheinlichkeitTextField;
+	int pop = 100;
+	int gen = 1000;
+	int indiv = 100000;
+	int value = 100;
 
 	/**
 	 * Launch the application.
@@ -229,8 +233,11 @@ public class GUISoftComp extends JFrame {
 		gbc_SteadystateRadioBtn.gridy = 11;
 		contentPane.add(SteadystateRadioBtn, gbc_SteadystateRadioBtn);
 
-		JSlider slider = new JSlider();
-		slider.setValue(100);
+		JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 1000, 100);
+		// slider.setMinorTickSpacing(100);
+		slider.setMajorTickSpacing(100);
+		slider.setPaintTicks(true);
+		slider.setSnapToTicks(true);
 		GridBagConstraints gbc_slider = new GridBagConstraints();
 		gbc_slider.anchor = GridBagConstraints.NORTH;
 		gbc_slider.fill = GridBagConstraints.HORIZONTAL;
@@ -239,6 +246,7 @@ public class GUISoftComp extends JFrame {
 		gbc_slider.gridx = 4;
 		gbc_slider.gridy = 11;
 		contentPane.add(slider, gbc_slider);
+		// TODO: listener
 
 		JRadioButton RankSelektionRadiobtn = new JRadioButton("Rank-Selektion (Elternselektion)");
 		buttonGroup_2.add(RankSelektionRadiobtn);
@@ -249,7 +257,7 @@ public class GUISoftComp extends JFrame {
 		gbc_RankSelektionRadiobtn.gridy = 12;
 		contentPane.add(RankSelektionRadiobtn, gbc_RankSelektionRadiobtn);
 
-		JLabel Populationlbl = new JLabel("Population:");
+		JLabel Populationlbl = new JLabel("Population: "+pop);
 		GridBagConstraints gbc_Populationlbl = new GridBagConstraints();
 		gbc_Populationlbl.anchor = GridBagConstraints.WEST;
 		gbc_Populationlbl.insets = new Insets(0, 0, 5, 5);
@@ -257,7 +265,7 @@ public class GUISoftComp extends JFrame {
 		gbc_Populationlbl.gridy = 12;
 		contentPane.add(Populationlbl, gbc_Populationlbl);
 
-		JLabel Generationlbl = new JLabel("Generationen:");
+		JLabel Generationlbl = new JLabel("Generationen: " + gen);
 		GridBagConstraints gbc_Generationlbl = new GridBagConstraints();
 		gbc_Generationlbl.anchor = GridBagConstraints.NORTHWEST;
 		gbc_Generationlbl.insets = new Insets(0, 0, 5, 5);
@@ -265,7 +273,7 @@ public class GUISoftComp extends JFrame {
 		gbc_Generationlbl.gridy = 13;
 		contentPane.add(Generationlbl, gbc_Generationlbl);
 
-		JLabel lblIndividuen = new JLabel("Individuen:");
+		JLabel lblIndividuen = new JLabel("Individuen: " + indiv);
 		GridBagConstraints gbc_lblIndividuen = new GridBagConstraints();
 		gbc_lblIndividuen.anchor = GridBagConstraints.NORTHWEST;
 		gbc_lblIndividuen.insets = new Insets(0, 0, 5, 5);
@@ -282,32 +290,22 @@ public class GUISoftComp extends JFrame {
 		gbc_CalcBtn.gridx = 2;
 		gbc_CalcBtn.gridy = 16;
 		contentPane.add(CalcBtn, gbc_CalcBtn);
-		CalcBtn.addActionListener(new ActionListener() {
-
+		
+		slider.addChangeListener(new ChangeListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				GA einGA = new GA();
-				for (int g = 0; g < (int) 10; g++) {
-					if (EinPunktRadiobtn.getModel().isSelected()) {
-						einGA.onePointCrossover();
-					} else {
-						einGA.uniformCrossover();
-					}
-					if (FlipMutaRadioButton.getModel().isSelected()) {
-						einGA.flipMutation();
-					} else {
-						einGA.swapMutation();
-					}
-					
-					if (RankSelektionRadiobtn.getModel().isSelected()) {
-						einGA.selectionRankReplacement(2);// Dekodieren
-					} else if (SteadystateRadioBtn.getModel().isSelected()){
-						//nomethod?
-					} else {
-						einGA.selectionGenReplacement();
-					}
+			public void stateChanged(ChangeEvent e) {
+				value = slider.getValue();
+				if (slider.getValue() == 0) {
+					value = slider.getValue() + 1;
 				}
-
+				pop = value;
+				gen = 100000 / value;
+				indiv = pop * gen;
+				System.out.println(pop);
+				System.out.println(gen);
+				Populationlbl.setText("Pupulation: "+ pop);
+				Generationlbl.setText("Gerationen: "+ gen);
+				lblIndividuen.setText("Individuen: "+indiv);
 			}
 		});
 
@@ -352,6 +350,41 @@ public class GUISoftComp extends JFrame {
 		gbc_lblallesgenial.gridx = 1;
 		gbc_lblallesgenial.gridy = 20;
 		contentPane.add(lblallesgenial, gbc_lblallesgenial);
+		
+		CalcBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GA einGA = new GA(pop, Integer.valueOf(WahrscheinlichkeitTextField.getText()));
+				for (int g = 0; g <= gen; g++) {
+					if (g == gen && (100000 - (pop * gen)) != 0) {
+						einGA.setPopulation(100000 - (pop * gen));
+					}
+					if (EinPunktRadiobtn.getModel().isSelected()) {
+						einGA.onePointCrossover();
+					} else {
+						einGA.uniformCrossover();
+					}
+					if (FlipMutaRadioButton.getModel().isSelected()) {
+						einGA.flipMutation();
+					} else {
+						einGA.swapMutation();
+					}
+
+					if (RankSelektionRadiobtn.getModel().isSelected()) {
+						einGA.selectionRankReplacement(2);// Dekodieren
+					} else if (SteadystateRadioBtn.getModel().isSelected()) {
+						// nomethod?
+					} else {
+						einGA.selectionGenReplacement();
+					}
+					lblBesteLoesung.setText("Beste L\u00F6sung: "+einGA.besteFitness);
+					lblFitness.setText("Fitness: "+einGA.aktLoesung);
+					
+				}
+
+			}
+		});
 	}
 
 }
