@@ -293,13 +293,18 @@ class GA {
 	/* Selektion (Gen-Replacement) <<<<<<<<<<<<<<<<<<<< */
 	void selectionGenReplacement() {
 		String result = "";
-
+		
 		//loop Anzahl Individuen
 		for (int i = 0; i < anz; i++) {
-
+		
 			//calc fitness of A+B
 			fitnessA[i] = berechneFitness(i, nutzwerteA);
 			fitnessB[i] = berechneFitness(i, nutzwerteB);
+			
+			//alte Eltern zwischenspeichern
+			for (int j = 0; j < gene; j++) {
+				eltern[i][j] = nachkommen[i][j];
+			}
 
 			//if newFitness BETTER AS besteFitness set newBesteFitness
 			if (fitnessA[i]+fitnessB[i] > besteFitness) {
@@ -309,16 +314,11 @@ class GA {
 				for (int j = 0; j < gene; j++) {
 					besteLsg[j] = eltern[i][j];
 
-					//+++ Hier müssen die guten Eltern gespeichert werden für Elitär
+					//gute Eltern speichern für Elitär
 					guteEltern[][] = eltern[i][j];
 				}
 			}
 
-			//+++ Eltern für die nächste Generation bereit stellen
-			for (int j = 0; j < gene; j++) {
-				//fill eltern-Array with nachkommen-Array
-				eltern[i][j] = nachkommen[i][j];
-			}
 			//gute Eltern der alten Generation in nächste Gen übernehmen
 			eltern[][] = guteEltern[][];
 		}
@@ -328,7 +328,7 @@ class GA {
 			result +="["+k+"]";
 		}
 		
-		aktLoesung = fitnessA[0]+fitnessB[0];
+		float aktLoesung = fitnessA[0]+fitnessB[0];
 		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + aktLoesung);
 		//print result
 		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + fitnessA[0]+fitnessB[0] + " Bestes Individuum: "+result);
