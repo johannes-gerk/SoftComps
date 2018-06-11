@@ -293,6 +293,75 @@ class GA {
 			}
 		}
 	}
+	void swapMutation2() {
+		int zz1, zz2;
+		float zzf;
+		for (int i = 0; i < anz; i++) {
+			for (int j = 0; j < gene; j++) {
+				zzf = r.nextFloat();
+				if (zzf <= pm/100) {
+					zz1 = Math.abs(r.nextInt()) % gene;
+					zz2 = Math.abs(r.nextInt()) % gene;
+					if (eltern[i][zz1] == 0) {
+						nachkommen[i][zz1] = 0;
+					} else {
+						nachkommen[i][zz1] = 1;
+					}
+					if (eltern[i][zz2] == 0) {
+						nachkommen[i][zz2] = 0;
+					} else {
+						nachkommen[i][zz2] = 1;
+					}
+					}
+			}
+		}
+	}
+	void selectionSteadyStateRep() {
+		String result = "";
+		int[][] saveEltern = new int[anz][gene];
+		float[] alteElternFitnessA = new float[anz];
+		float[] alteElternFitnessB = new float[anz];
+		
+		System.arraycopy(saveEltern, 0, eltern, 0, saveEltern.length);
+		
+		for (int i= 0; i < anz; i++) {
+			int indiv = Math.abs(r.nextInt())%anz;
+			alteElternFitnessA[i] = berechneFitness(i, nutzwerteA);
+			alteElternFitnessB[i] = berechneFitness(i, nutzwerteB);
+			
+			for (int j = 0; j < gene; j++) {
+				eltern[i][j] = nachkommen[indiv][j];
+			}
+			
+			fitnessA[i] = berechneFitness(i, nutzwerteA);
+			fitnessB[i] = berechneFitness(i, nutzwerteB);
+			
+			if (alteElternFitnessA[i]+alteElternFitnessB[i] > fitnessA[i]+fitnessB[i]) {
+				for (int j = 0; j < gene; j++) {
+					eltern[i][j] = saveEltern[i][j];
+				}
+			}
+			fitnessA[i] = berechneFitness(i, nutzwerteA);
+			fitnessB[i] = berechneFitness(i, nutzwerteB);
+			
+			if (fitnessA[i]+fitnessB[i] > besteFitness) {
+				besteFitness = fitnessA[i]+fitnessB[i];
+
+				for (int j = 0; j < gene; j++) {
+					besteLsg[j] = eltern[i][j];
+				}
+			}
+
+		}
+
+		for (int k: besteLsg) {
+			result +="["+k+"]";
+		}
+		
+		float aktLoesung = fitnessA[0]+fitnessB[0];
+		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + aktLoesung);
+		
+	}
 
 	/* Selektion (Gen-Replacement) <<<<<<<<<<<<<<<<<<<< */
 	void selectionGenReplacement() {

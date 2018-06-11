@@ -301,8 +301,6 @@ public class GUISoftComp extends JFrame {
 				pop = value;
 				gen = 100000 / value;
 				indiv = pop * gen;
-				System.out.println(pop);
-				System.out.println(gen);
 				Populationlbl.setText("Pupulation: " + pop);
 				Generationlbl.setText("Gerationen: " + gen);
 				lblIndividuen.setText("Individuen: " + indiv);
@@ -370,13 +368,13 @@ public class GUISoftComp extends JFrame {
 						if (FlipMutaRadioButton.getModel().isSelected()) {
 							einGA.flipMutation();
 						} else {
-							einGA.swapMutation();
+							einGA.swapMutation2();
 						}
 
 						if (RankSelektionRadiobtn.getModel().isSelected()) {
 							einGA.selectionRankReplacement(2);// Dekodieren
 						} else if (SteadystateRadioBtn.getModel().isSelected()) {
-							// nomethod?
+							einGA.selectionSteadyStateRep();
 						} else {
 							einGA.selectionGenReplacement();
 						}
