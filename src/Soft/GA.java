@@ -16,8 +16,8 @@ import java.sql.Time;
 class GA {
 
 	int anz; // Anzahl Individuen
-	static int gene; // Anzahl Gene
-	static int pm; // Wahrscheinlichkeit fuer Mutation
+	int gene; // Anzahl Gene
+	float pm; // Wahrscheinlichkeit fuer Mutation
 
 	int[][] eltern;
 	int[][] nachkommen;
@@ -91,7 +91,7 @@ class GA {
 		return result;
 	}
 
-	public GA(int anz, int pm) {
+	public GA(int anz, float pm) {
 			
 		this.anz = anz; // Anzahl Individuen
 		gene = 100; // Anzahl Gene
@@ -255,11 +255,14 @@ class GA {
 
 	/* Flip-Mutation */
 	void flipMutation() {
-		int zz;
+		//int zz;
+		float zzf;
 		for (int i = 0; i < anz; i++) {
 			for (int j = 0; j < gene; j++) {
-				zz = Math.abs(r.nextInt()) % 1000;
-				if (zz < pm) {
+				//zz = Math.abs(r.nextInt()) % 1000;
+				zzf = r.nextFloat();
+				if (zzf <= pm/100)
+				//if (zz < pm) {
 					if (nachkommen[i][j] == 0)
 						nachkommen[i][j] = 1;
 					else
@@ -267,25 +270,26 @@ class GA {
 				}
 			}
 		}
-	}
 	
 		/* Swap-Mutation */
 	void swapMutation() {
 		int zz1, zz2;
-
+		float zzf;
 		for (int i = 0; i < anz; i++) {
 			for (int j = 0; j < gene; j++) {
-
-				// Auswahl ZWEIER random Stellen
-				zz1 = Math.abs(r.nextInt()) % anz;
-				//System.out.println("erster Wert: " + zz1);
-				zz2 = Math.abs(r.nextInt()) % anz;
-				//System.out.println("zweiter Wert: " + zz2);
-				// Tauschen der Bits
-				nachkommen[i][j] = eltern[zz1][j];
-				//System.out.println("erste Ersetzung: " + nachkommen[zz2][j] + " wird zu " + eltern[zz1][j]);
-				nachkommen[i][j] = eltern[zz2][j];
-				//System.out.println("zweite Ersetzung: " + nachkommen[zz1][j] + " wird zu " + eltern[zz2][j]);
+				zzf = r.nextFloat();
+				if (zzf <= pm/100) {
+					// Auswahl ZWEIER random Stellen
+					zz1 = Math.abs(r.nextInt()) % anz;
+					//System.out.println("erster Wert: " + zz1);
+					zz2 = Math.abs(r.nextInt()) % anz;
+					//System.out.println("zweiter Wert: " + zz2);
+					// Tauschen der Bits
+					nachkommen[i][j] = eltern[zz1][j];
+					//System.out.println("erste Ersetzung: " + nachkommen[zz2][j] + " wird zu " + eltern[zz1][j]);
+					nachkommen[i][j] = eltern[zz2][j];
+					//System.out.println("zweite Ersetzung: " + nachkommen[zz1][j] + " wird zu " + eltern[zz2][j]);
+				}
 			}
 		}
 	}
@@ -293,19 +297,40 @@ class GA {
 	/* Selektion (Gen-Replacement) <<<<<<<<<<<<<<<<<<<< */
 	void selectionGenReplacement() {
 		String result = "";
+		int[][] guteEltern = new int[anz][gene];
+		float[] alteElternFitnessA = new float[anz];
+		float[] alteElternFitnessB = new float[anz];
+		
+		System.arraycopy(guteEltern, 0, eltern, 0, guteEltern.length);
 		
 		//loop Anzahl Individuen
 		for (int i = 0; i < anz; i++) {
-		
+			
+			//calc fitness ALT
+			alteElternFitnessA[i] = berechneFitness(i, nutzwerteA);
+			alteElternFitnessB[i] = berechneFitness(i, nutzwerteB);
+			
+			//alte Eltern ersetzen
+			for (int j = 0; j < gene; j++) {
+				eltern[i][j] = nachkommen[i][j];
+			}
+			
+			//calc fitness of A+B
+			fitnessA[i] = berechneFitness(i, nutzwerteA);
+			fitnessB[i] = berechneFitness(i, nutzwerteB);
+
+			//vergleiche alt vs neu
+			if (alteElternFitnessA[i]+alteElternFitnessB[i] > fitnessA[i]+fitnessB[i]) {
+				//alte Eltern nochmal ersetzen
+				for (int j = 0; j < gene; j++) {
+					eltern[i][j] = guteEltern[i][j];
+				}
+			}
+			
 			//calc fitness of A+B
 			fitnessA[i] = berechneFitness(i, nutzwerteA);
 			fitnessB[i] = berechneFitness(i, nutzwerteB);
 			
-			//alte Eltern zwischenspeichern
-			for (int j = 0; j < gene; j++) {
-				eltern[i][j] = nachkommen[i][j];
-			}
-
 			//if newFitness BETTER AS besteFitness set newBesteFitness
 			if (fitnessA[i]+fitnessB[i] > besteFitness) {
 				besteFitness = fitnessA[i]+fitnessB[i];
@@ -314,13 +339,14 @@ class GA {
 				for (int j = 0; j < gene; j++) {
 					besteLsg[j] = eltern[i][j];
 
-					//gute Eltern speichern für Elitär
-					guteEltern[][] = eltern[i][j];
+					//gute Eltern speichern fuer Elitaer
+					//System.arraycopy(guteEltern, 0, eltern[i][j], 0, guteEltern.length);
+					
 				}
 			}
 
 			//gute Eltern der alten Generation in nächste Gen übernehmen
-			eltern[][] = guteEltern[][];
+			//eltern = Arrays.copyOf(guteEltern, guteEltern.length+1);
 		}
 
 		//prepare result Text
@@ -331,7 +357,7 @@ class GA {
 		float aktLoesung = fitnessA[0]+fitnessB[0];
 		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + aktLoesung);
 		//print result
-		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + fitnessA[0]+fitnessB[0] + " Bestes Individuum: "+result);
+		//System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + fitnessA[0]+fitnessB[0] + " Bestes Individuum: "+result);
 		/*
 		 * for(int j=0;j<gene;j++) { System.out.print(" "+eltern[0][j]); }
 		 * System.out.println();
@@ -405,7 +431,7 @@ class GA {
 			case 1:
 				int iterator = 0;
 				for (Map.Entry<int[], Float> entry : sortedProbabilityMapA.entrySet()) {
-					if (Math.random() <= entry.getValue()) {
+					if (r.nextFloat() <= entry.getValue()) {
 						save[iterator] = entry.getKey();
 						successAmount=+1;
 						iterator++;
@@ -413,7 +439,7 @@ class GA {
 				}
 				iterator = 0;
 				for (Map.Entry<int[], Float> entry : sortedProbabilityMapB.entrySet()) {
-					if (Math.random() <= entry.getValue()) {
+					if (r.nextFloat() <= entry.getValue()) {
 						save[iterator] = entry.getKey();
 						successAmount=+1;
 						iterator++;
