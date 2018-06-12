@@ -358,7 +358,7 @@ class GA {
 			result +="["+k+"]";
 		}
 		
-		float aktLoesung = fitnessA[0]+fitnessB[0];
+		aktLoesung = fitnessA[0]+fitnessB[0];
 		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + aktLoesung);
 		
 	}
@@ -423,7 +423,7 @@ class GA {
 			result +="["+k+"]";
 		}
 		
-		float aktLoesung = fitnessA[0]+fitnessB[0];
+		aktLoesung = fitnessA[0]+fitnessB[0];
 		System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + aktLoesung);
 		//print result
 		//System.out.println("Beste Loesung: " + besteFitness + " Aktuelle Loesung: " + fitnessA[0]+fitnessB[0] + " Bestes Individuum: "+result);
